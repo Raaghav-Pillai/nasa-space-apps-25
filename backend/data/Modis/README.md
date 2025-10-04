@@ -24,32 +24,81 @@
 5. Data Caveats  
 6. Documentation  
 7. Sample Request Retention  
-8. Software Citation  
-9. Feedback  
+8. Data Product Citations  
+9. Software Citation  
+10. Feedback  
 
 ## 1. Request Parameters  
 
-    Name: Daymet-Chicago-Past-Year  
+    Name: MODIS-Chicago-2020-2024-Retry  
 
-    Date Completed:** 2025-10-04T18:19:10.425100  
+    Date Completed:** 2025-10-04T18:40:56.960725  
 
-    ID: b1355f03-e5ab-4ba7-a327-6666315d9648  
+    ID: 1fa208c1-7d15-4c1e-ab8a-684c25a982c3  
 
     Details:  
 
-        Start Date: 05-15-2023  
+        Start Date: 01-01-2020  
 
-        End Date: 05-15-2024
+        End Date: 12-31-2024
     
         Layers:  
 
-            dayl (DAYMET.004)  
-            prcp (DAYMET.004)  
-            srad (DAYMET.004)  
-            swe (DAYMET.004)  
-            tmax (DAYMET.004)  
-            tmin (DAYMET.004)  
-            vp (DAYMET.004)  
+            QC_500m_1 (MOD09GA.061)  
+            Range_1 (MOD09GA.061)  
+            SensorAzimuth_1 (MOD09GA.061)  
+            SensorZenith_1 (MOD09GA.061)  
+            SolarAzimuth_1 (MOD09GA.061)  
+            SolarZenith_1 (MOD09GA.061)  
+            gflags_1 (MOD09GA.061)  
+            granule_pnt_1 (MOD09GA.061)  
+            iobs_res_1 (MOD09GA.061)  
+            num_observations_1km (MOD09GA.061)  
+            obscov_500m_1 (MOD09GA.061)  
+            orbit_pnt_1 (MOD09GA.061)  
+            state_1km_1 (MOD09GA.061)  
+            sur_refl_b01_1 (MOD09GA.061)  
+            sur_refl_b02_1 (MOD09GA.061)  
+            sur_refl_b03_1 (MOD09GA.061)  
+            sur_refl_b04_1 (MOD09GA.061)  
+            sur_refl_b05_1 (MOD09GA.061)  
+            sur_refl_b06_1 (MOD09GA.061)  
+            sur_refl_b07_1 (MOD09GA.061)  
+            Clear_day_cov (MOD11A1.061)  
+            Clear_night_cov (MOD11A1.061)  
+            Day_view_angl (MOD11A1.061)  
+            Day_view_time (MOD11A1.061)  
+            Emis_31 (MOD11A1.061)  
+            Emis_32 (MOD11A1.061)  
+            LST_Day_1km (MOD11A1.061)  
+            LST_Night_1km (MOD11A1.061)  
+            Night_view_angl (MOD11A1.061)  
+            Night_view_time (MOD11A1.061)  
+            QC_Day (MOD11A1.061)  
+            QC_Night (MOD11A1.061)  
+            _500m_16_days_EVI (MOD13A1.061)  
+            _500m_16_days_MIR_reflectance (MOD13A1.061)  
+            _500m_16_days_NDVI (MOD13A1.061)  
+            _500m_16_days_NIR_reflectance (MOD13A1.061)  
+            _500m_16_days_VI_Quality (MOD13A1.061)  
+            _500m_16_days_blue_reflectance (MOD13A1.061)  
+            _500m_16_days_composite_day_of_the_year (MOD13A1.061)  
+            _500m_16_days_pixel_reliability (MOD13A1.061)  
+            _500m_16_days_red_reflectance (MOD13A1.061)  
+            _500m_16_days_relative_azimuth_angle (MOD13A1.061)  
+            _500m_16_days_sun_zenith_angle (MOD13A1.061)  
+            _500m_16_days_view_zenith_angle (MOD13A1.061)  
+            NDSI_Snow_Cover (MOD10A1.061)  
+            NDSI_Snow_Cover_Algorithm_Flags_QA (MOD10A1.061)  
+            NDSI_Snow_Cover_Basic_QA (MOD10A1.061)  
+            Snow_Albedo_Daily_Tile (MOD10A1.061)  
+            granule_pnt (MOD10A1.061)  
+            orbit_pnt (MOD10A1.061)  
+            ET_500m (MOD16A2.061)  
+            ET_QC_500m (MOD16A2.061)  
+            LE_500m (MOD16A2.061)  
+            PET_500m (MOD16A2.061)  
+            PLE_500m (MOD16A2.061)  
     
         Coordinates:  
 
@@ -60,13 +109,29 @@
 ## 2. Request File Listing  
 
 - Comma-separated values file with data extracted for a specific product
-  - Daymet-Chicago-Past-Year-DAYMET-004-results.csv
+  - MODIS-Chicago-2020-2024-Retry-MOD09GA-061-results.csv
+- Comma-separated values file with data extracted for a specific product
+  - MODIS-Chicago-2020-2024-Retry-MOD10A1-061-results.csv
+- Comma-separated values file with data extracted for a specific product
+  - MODIS-Chicago-2020-2024-Retry-MOD11A1-061-results.csv
+- Comma-separated values file with data extracted for a specific product
+  - MODIS-Chicago-2020-2024-Retry-MOD13A1-061-results.csv
+- Comma-separated values file with data extracted for a specific product
+  - MODIS-Chicago-2020-2024-Retry-MOD16A2-061-results.csv
 - Text file with data pool URLs for all source granules used in the extraction
-  - Daymet-Chicago-Past-Year-granule-list.txt
+  - MODIS-Chicago-2020-2024-Retry-granule-list.txt
 - JSON request file which can be used in AppEEARS to create a new request
-  - Daymet-Chicago-Past-Year-request.json
+  - MODIS-Chicago-2020-2024-Retry-request.json
 - xml file
-  - Daymet-Chicago-Past-Year-DAYMET-004-metadata.xml  
+  - MODIS-Chicago-2020-2024-Retry-MOD09GA-061-metadata.xml
+- xml file
+  - MODIS-Chicago-2020-2024-Retry-MOD10A1-061-metadata.xml
+- xml file
+  - MODIS-Chicago-2020-2024-Retry-MOD11A1-061-metadata.xml
+- xml file
+  - MODIS-Chicago-2020-2024-Retry-MOD13A1-061-metadata.xml
+- xml file
+  - MODIS-Chicago-2020-2024-Retry-MOD16A2-061-metadata.xml  
 
 ## 3. Point Sample Extraction Process  
 
@@ -306,10 +371,18 @@ Documentation for data products available through AppEEARS are listed below.
 
 AppEEARS sample request outputs are available to download for a limited amount of time after completion. Please visit <https://appeears.earthdatacloud.nasa.gov/help?section=sample-retention> for details.  
 
-## 8. Software Citation  
+## 8. Data Product Citations  
+
+- Didan, K. (2021). MODIS/Terra Vegetation Indices 16-Day L3 Global 500m SIN Grid V061. NASA EOSDIS Land Processes Distributed Active Archive Center. Accessed 2025-10-04 from https://doi.org/10.5067/MODIS/MOD13A1.061. Accessed October 4, 2025.
+- Hall, D., Riggs, G. (2016). MODIS/Terra Snow Cover Daily L3 Global 500m Grid, Version 6. Boulder, Colorado USA. NASA National Snow and Ice Data Center Distributed Active Archive Center. doi: 10.5067/MODIS/MOD10A1.061. Accessed October 4, 2025.
+- Running, S., Mu, Q., Zhao, M. (2021). MODIS/Terra Net Evapotranspiration 8-Day L4 Global 500m SIN Grid V061. NASA EOSDIS Land Processes Distributed Active Archive Center. Accessed 2025-10-04 from https://doi.org/10.5067/MODIS/MOD16A2.061. Accessed October 4, 2025.
+- Vermote, E., Wolfe, R. (2021). MODIS/Terra Surface Reflectance Daily L2G Global 1km and 500m SIN Grid V061. NASA EOSDIS Land Processes Distributed Active Archive Center. Accessed 2025-10-04 from https://doi.org/10.5067/MODIS/MOD09GA.061. Accessed October 4, 2025.
+- Wan, Z., Hook, S., Hulley, G. (2021). MODIS/Terra Land Surface Temperature/Emissivity Daily L3 Global 1km SIN Grid V061. NASA EOSDIS Land Processes Distributed Active Archive Center. Accessed 2025-10-04 from https://doi.org/10.5067/MODIS/MOD11A1.061. Accessed October 4, 2025.
+
+## 9. Software Citation  
 
 AppEEARS Team. (2025). Application for Extracting and Exploring Analysis Ready Samples (AppEEARS). Ver. 3.99. NASA EOSDIS Land Processes Distributed Active Archive Center (LP DAAC), USGS/Earth Resources Observation and Science (EROS) Center, Sioux Falls, South Dakota, USA. Accessed October 4, 2025. https://appeears.earthdatacloud.nasa.gov
 
-## 9. Feedback  
+## 10. Feedback  
 
 We value your opinion. Please help us identify what works, what doesn't, and anything we can do to make AppEEARS better by submitting your feedback at https://appeears.earthdatacloud.nasa.gov/feedback or to LP DAAC User Services at <https://lpdaac.usgs.gov/lpdaac-contact-us/>

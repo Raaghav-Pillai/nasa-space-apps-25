@@ -1,4 +1,5 @@
 requests,
 xarray,
 pandas,
-matplotlib
+matplotlib,
+netCDF4
