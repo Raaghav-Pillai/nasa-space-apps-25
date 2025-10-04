@@ -1,0 +1,6 @@
+*.nc
+*.h5
+*.csv
+*.json
+*.sqlite3
+*.db
