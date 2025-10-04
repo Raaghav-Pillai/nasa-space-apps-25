@@ -3,16 +3,17 @@ import requests
 import os
 from datetime import datetime
 import time
+from requests.auth import HTTPBasicAuth
 
 def download_nc_files_from_csv(csv_path, output_dir, username=None, password=None, max_files=None):
     """
-    Download NetCDF files from URLs listed in a CSV file.
+    Download NetCDF files from URLs listed in a CSV file using NASA Earthdata authentication.
 
     Args:
         csv_path: Path to CSV file containing URLs (list_nc.csv)
         output_dir: Directory where NC files will be saved
-        username: NASA Earthdata username (will prompt if not provided)
-        password: NASA Earthdata password (will prompt if not provided)
+        username: NASA Earthdata username (will use .netrc if not provided)
+        password: NASA Earthdata password (will use .netrc if not provided)
         max_files: Maximum number of files to download (None = all)
     """
 
@@ -35,12 +36,14 @@ def download_nc_files_from_csv(csv_path, output_dir, username=None, password=Non
 
     print(f"Found {len(urls)} URLs to download")
 
-    # Get credentials if not provided
-    if username is None:
-        username = input("Enter NASA Earthdata username: ")
-    if password is None:
-        import getpass
-        password = getpass.getpass("Enter NASA Earthdata password: ")
+    # Setup authentication
+    auth = None
+    if username and password:
+        auth = HTTPBasicAuth(username, password)
+        print("Using provided credentials")
+    else:
+        print("Using .netrc file for authentication")
+        print("(Run setup_earthdata_auth.py if you haven't configured it)")
 
     # Create output directory
     os.makedirs(output_dir, exist_ok=True)
@@ -53,85 +56,85 @@ def download_nc_files_from_csv(csv_path, output_dir, username=None, password=Non
     for idx, url in enumerate(urls):
         try:
             # Extract date from URL (CLDPROP_D3_VIIRS_NOAA20.A2025001...)
-            # Format: AYYDDD where YY is year and DDD is day of year
             parts = url.split('.')
             date_part = None
             for part in parts:
                 if part.startswith('A') and len(part) >= 8:
-                    date_part = part[1:8]  # Remove 'A' and get YYYYDDD
+                    date_part = part[1:8]
                     break
 
             if date_part:
-                # Convert YYYYDDD to YYYY-MM-DD
                 year = int(date_part[:4])
                 day_of_year = int(date_part[4:])
                 date_obj = datetime(year, 1, 1) + pd.Timedelta(days=day_of_year - 1)
                 filename = f"{date_obj.strftime('%Y-%m-%d')}.nc"
             else:
-                # Fallback: use index
                 filename = f"file_{idx:04d}.nc"
 
             output_path = os.path.join(output_dir, filename)
 
-            # Skip if already exists and is not HTML
+            # Skip if already exists and is valid NetCDF
             if os.path.exists(output_path):
-                # Check if it's a valid NetCDF file (not HTML)
                 with open(output_path, 'rb') as f:
                     first_bytes = f.read(100)
-                    if b'<!DOCTYPE' not in first_bytes and b'<html' not in first_bytes:
+                    # Check for NetCDF magic number or HDF5 signature
+                    if (first_bytes[:3] == b'CDF' or  # NetCDF classic
+                        first_bytes[:4] == b'\x89HDF' or  # HDF5/NetCDF4
+                        (b'<!DOCTYPE' not in first_bytes and b'<html' not in first_bytes)):
                         print(f"[{idx+1}/{len(urls)}] Skipping {filename} - already exists")
                         skipped += 1
                         continue
 
-            # Download with authentication
             print(f"[{idx+1}/{len(urls)}] Downloading {filename}...")
 
-            # NASA Earthdata requires handling OAuth redirects
-            session = requests.Session()
+            # Create session for handling redirects
+            with requests.Session() as session:
+                # If credentials provided, use them
+                if auth:
+                    session.auth = auth
 
-            # First request to get redirect to login
-            response1 = session.get(url, allow_redirects=False, timeout=120)
+                # Make request
+                response = session.get(url, allow_redirects=True, timeout=180)
 
-            # Follow redirect to URS (Earthdata Login)
-            if response1.status_code in [301, 302, 303, 307, 308]:
-                auth_url = response1.headers.get('Location')
-
-                # Authenticate with URS
-                auth_response = session.get(
-                    auth_url,
-                    auth=(username, password),
-                    allow_redirects=True,
-                    timeout=120
-                )
-
-                # Now try the original URL again with the authenticated session
-                response = session.get(url, allow_redirects=True, timeout=120)
-            else:
-                # Direct download with basic auth
-                session.auth = (username, password)
-                response = session.get(url, allow_redirects=True, timeout=120)
-
-            if response.status_code == 200:
-                # Check if response is HTML (login page)
-                if b'<!DOCTYPE' in response.content[:100] or b'<html' in response.content[:100]:
-                    print(f"  ⚠ Warning: Received HTML instead of NetCDF - check credentials")
+                # Handle redirects for authentication
+                if response.status_code == 401:
+                    print(f"  ✗ Authentication failed - check credentials")
                     failed += 1
+                    continue
+
+                if response.status_code == 200:
+                    # Check if response is HTML
+                    content_type = response.headers.get('Content-Type', '')
+
+                    if ('text/html' in content_type or
+                        b'<!DOCTYPE' in response.content[:200] or
+                        b'<html' in response.content[:200] or
+                        b'Earthdata Login' in response.content[:1000]):
+
+                        print(f"  ✗ Received HTML (login page) - authentication issue")
+                        print(f"     Please run: python setup_earthdata_auth.py")
+                        failed += 1
+
+                        # Save the HTML for debugging
+                        debug_path = output_path.replace('.nc', '_debug.html')
+                        with open(debug_path, 'wb') as f:
+                            f.write(response.content[:5000])
+                    else:
+                        # Save NetCDF file
+                        with open(output_path, 'wb') as f:
+                            f.write(response.content)
+
+                        file_size_mb = len(response.content) / (1024 * 1024)
+                        print(f"  ✓ Downloaded {file_size_mb:.1f} MB")
+                        downloaded += 1
                 else:
-                    # Save file
-                    with open(output_path, 'wb') as f:
-                        f.write(response.content)
+                    print(f"  ✗ HTTP {response.status_code}: {response.reason}")
+                    failed += 1
 
-                    file_size_mb = len(response.content) / (1024 * 1024)
-                    print(f"  ✓ Downloaded {file_size_mb:.1f} MB")
-                    downloaded += 1
-            else:
-                print(f"  ✗ Failed: HTTP {response.status_code}")
-                failed += 1
-
-            # Rate limiting - be nice to the server
+            # Rate limiting
             time.sleep(0.5)
 
-            # Progress update every 10 files
+            # Progress update
             if (idx + 1) % 10 == 0:
                 print(f"\nProgress: {idx+1}/{len(urls)} | Downloaded: {downloaded} | Failed: {failed} | Skipped: {skipped}\n")
 
@@ -150,28 +153,29 @@ def download_nc_files_from_csv(csv_path, output_dir, username=None, password=Non
     print(f"Output directory: {output_dir}")
     print("="*70)
 
-    return True
+    if failed > 0 and downloaded == 0:
+        print("\n⚠ All downloads failed. This is likely an authentication issue.")
+        print("Try running: python setup_earthdata_auth.py")
+        print("Or check: https://urs.earthdata.nasa.gov/")
+
+    return downloaded > 0
 
 if __name__ == "__main__":
-    import sys
-
-    # Determine if we're running from backend/ or project root
+    # Determine if running from backend/ or project root
     current_dir = os.getcwd()
     if os.path.basename(current_dir) == 'backend':
-        # Running from backend directory
         csv_file = os.path.join('data', 'Cloud', 'list_nc.csv')
         output_directory = os.path.join('data', 'Cloud', 'nc_files')
     else:
-        # Running from project root
         csv_file = os.path.join('backend', 'data', 'Cloud', 'list_nc.csv')
         output_directory = os.path.join('backend', 'data', 'Cloud', 'nc_files')
 
-    # You can set credentials here or leave None to be prompted
-    EARTHDATA_USERNAME = None  # or set to your username
-    EARTHDATA_PASSWORD = None  # or set to your password
+    # Credentials (None = use .netrc)
+    EARTHDATA_USERNAME = None
+    EARTHDATA_PASSWORD = None
 
-    # Limit download for testing (None = download all)
-    MAX_FILES = None  # Set to a small number like 10 for testing
+    # Test with fewer files first
+    MAX_FILES = 5  # Change to None to download all
 
     print("="*70)
     print("NASA Earthdata NetCDF File Downloader")
@@ -180,21 +184,15 @@ if __name__ == "__main__":
     print(f"Output directory: {output_directory}")
 
     if MAX_FILES:
-        print(f"Limiting to first {MAX_FILES} files for testing")
+        print(f"\n⚠ Testing mode: Limiting to first {MAX_FILES} files")
+        print("Set MAX_FILES = None in the script to download all files")
 
-    print("\nNOTE: You need a NASA Earthdata account to download these files.")
-    print("Register at: https://urs.earthdata.nasa.gov/users/new")
-    print("="*70 + "\n")
+    print("\n" + "="*70 + "\n")
 
-    proceed = input("Do you want to proceed? (yes/no): ").strip().lower()
-
-    if proceed in ['yes', 'y']:
-        download_nc_files_from_csv(
-            csv_file,
-            output_directory,
-            username=EARTHDATA_USERNAME,
-            password=EARTHDATA_PASSWORD,
-            max_files=MAX_FILES
-        )
-    else:
-        print("Download cancelled.")
+    download_nc_files_from_csv(
+        csv_file,
+        output_directory,
+        username=EARTHDATA_USERNAME,
+        password=EARTHDATA_PASSWORD,
+        max_files=MAX_FILES
+    )
