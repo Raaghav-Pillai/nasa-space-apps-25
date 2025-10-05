@@ -223,10 +223,10 @@ export default function LocationStep({ location, setLocation, onNext }) {
             color: "#000",
             borderRadius: "12px",
             textTransform: "none",
-            fontWeight: 600,
+            fontWeight: 700,
             px: 4,
             py: 1,
-            "&:hover": { backgroundColor: "#F3CD52" },
+            "&:hover": { backgroundColor: "#C2A64C", color: "#fff" },
           }}
         >
           Next

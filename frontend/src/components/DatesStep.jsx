@@ -36,7 +36,7 @@ export default function DatesStep({ dates, setDates, onBack, onNext }) {
       <Typography variant="h6" fontWeight={700} color={darkText} textAlign="center">
         Would you like to plan for one day or multiple?
       </Typography>
-      <Stack direction="row" spacing={3}>
+      <Stack direction="row" spacing={3} mt={3}>
         <GoldButton onClick={() => goto("single")}>Just one!</GoldButton>
         <GoldButton onClick={() => goto("specific")}>Multiple!</GoldButton>
       </Stack>
@@ -69,7 +69,7 @@ export default function DatesStep({ dates, setDates, onBack, onNext }) {
           Select your date range!
         </Typography>
 
-        <Stack direction="row" spacing={2} mt={2}>
+        <Stack direction="row" spacing={3} mt={3}>
           <DatePicker
             label="From"
             value={start}
@@ -237,7 +237,7 @@ export default function DatesStep({ dates, setDates, onBack, onNext }) {
           Select your date and time!
         </Typography>
 
-        <Stack direction="row" spacing={2} mt={2} alignItems="flex-end">
+        <Stack direction="row" spacing={3} mt={3} alignItems="flex-end">
           <DatePicker
             label="Date"
             value={date}
@@ -286,46 +286,62 @@ export default function DatesStep({ dates, setDates, onBack, onNext }) {
   };
 
   /* ---------------- Container ---------------- */
-  return (
+/* ---------------- Container ---------------- */
+return (
+  <Box
+    sx={{
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      width: "100%",
+      maxWidth: 900,
+      mx: "auto",
+      p: 4,
+      borderRadius: "16px",
+      backgroundColor: "#FFFFFF",
+      minHeight: "30vh",
+      boxShadow: "0 3px 10px rgba(0,0,0,0.05)",
+      position: "relative",
+      overflow: "hidden", // ⬅️ prevents jump when menu opens
+    }}
+  >
+    <Box
+      sx={{
+        width: "100%",
+        maxWidth: 600,
+        margin: "0 auto",
+        display: "block",  // ⬅️ not flex! prevents reflow
+        textAlign: "center",
+      }}
+    >
+      {dates.subPage === "choice" && <Page4Choice />}
+      {dates.subPage === "specific" && <Page5Specific />}
+      {dates.subPage === "general" && <Page6General />}
+      {dates.subPage === "single" && <Page7Single />}
+    </Box>
+
     <Box
       sx={{
         display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center",
+        justifyContent: "space-between",
         width: "100%",
-        maxWidth: 900,
-        mx: "auto",
-        p: 4,
-        borderRadius: "16px",
-        backgroundColor: "#FFFFFF",
-        minHeight: "30vh",
-        boxShadow: "0 3px 10px rgba(0,0,0,0.05)",
+        mt: 3,
       }}
     >
-      <Box sx={{ width: "100%", display: "flex", justifyContent: "center", alignItems: "center", flexGrow: 1 }}>
-        {dates.subPage === "choice" && <Page4Choice />}
-        {dates.subPage === "specific" && <Page5Specific />}
-        {dates.subPage === "general" && <Page6General />}
-        {dates.subPage === "single" && <Page7Single />}
-      </Box>
-
-      <Box sx={{ display: "flex", justifyContent: "space-between", width: "100%", mt: 3 }}>
-        <GoldButton onClick={onBack}>Back</GoldButton>
-        <GoldButton
-          onClick={onNext}
-          disabled={!dates.startDate || !dates.endDate}
-          sx={{
-            opacity: !dates.startDate || !dates.endDate ? 0.6 : 1,
-            cursor: !dates.startDate || !dates.endDate ? "not-allowed" : "pointer",
-          }}
-        >
-          Next
-        </GoldButton>
-      </Box>
+      <GoldButton onClick={onBack}>Back</GoldButton>
+      <GoldButton
+        onClick={onNext}
+        disabled={!dates.startDate || !dates.endDate}
+        sx={{
+          opacity: !dates.startDate || !dates.endDate ? 0.6 : 1,
+          cursor: !dates.startDate || !dates.endDate ? "not-allowed" : "pointer",
+        }}
+      >
+        Next
+      </GoldButton>
     </Box>
-  );
-
+  </Box>
+);
   /* ---------------- Reusable Components ---------------- */
 function CenteredBox({ children }) {
   return (
@@ -337,17 +353,15 @@ function CenteredBox({ children }) {
         justifyContent: "center",
         textAlign: "center",
         width: "100%",
-        maxWidth: 600,
         mx: "auto",
         py: 2,
-        position: "relative",
         "& .MuiFormControl-root": {
           mx: "auto",
           display: "block",
           textAlign: "center",
         },
-        "& .MuiInputBase-root, & .MuiSelect-select, & .MuiOutlinedInput-root": {
-          textAlign: "center", // centers dropdown text too
+        "& .MuiOutlinedInput-root, & .MuiSelect-select": {
+          textAlign: "center",
         },
       }}
     >
@@ -362,15 +376,15 @@ function GoldButton({ children, sx, ...props }) {
         variant="contained"
         disableElevation
         sx={{
-          backgroundColor: "#C2A64C",
-          color: "#FFFFFF",
+          backgroundColor: gold,
+          color: "#000",
           borderRadius: "12px",
           px: 4,
           py: 1.1,
           textTransform: "none",
           fontWeight: 700,
           fontSize: "0.95rem",
-          "&:hover": { backgroundColor: "#B69944" },
+          "&:hover": { backgroundColor: "#C2A64C", color: "#fff" },
           "&:disabled": { backgroundColor: "#E6E2D3", color: "#999" },
           ...sx,
         }}

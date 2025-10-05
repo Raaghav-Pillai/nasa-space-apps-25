@@ -291,7 +291,7 @@ export default function ProfileStep({ onBack, onNext }) {
       fontWeight: 600,
       px: 4,
       py: 1,
-      "&:hover": { backgroundColor: "#F3CD52" },
+      "&:hover": { backgroundColor: "#C2A64C", color: "#fff" },
     }}
   >
     Back

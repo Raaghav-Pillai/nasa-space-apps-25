@@ -11,14 +11,14 @@ const theme = createTheme({
   cssVariables: true,
   colorSchemes: { light: true, dark: false },
   palette: {
-    primary: { main: '#ddf4abff' },
+    primary: { main: '#6e6321ff' },
     secondary: { main: '#6C757D' },
     background: { default: '#F8F9FA', paper: '#FFFFFF' },
   },
   typography: {
-    fontFamily: '"Roboto", "Noto Sans", "Helvetica", "Arial", sans-serif',
-    h6: { fontSize: '1.125rem', fontWeight: 700 },
-    body2: { color: '#5F6368' },
+    fontFamily: '"Nunito", sans-serif',
+    h6: { fontSize: '1.125rem', fontWeight: 800 },
+    body2: { color: '#5F6368', fontWeight: 500 },
   },
   shape: { borderRadius: 16 },
   components: {

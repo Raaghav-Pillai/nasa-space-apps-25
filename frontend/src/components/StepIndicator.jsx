@@ -12,7 +12,7 @@ export default function StepIndicator({ activeStep }) {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        backgroundColor: "#FFFFFF",
+        backgroundColor: "#fefcf4ff",
         borderRadius: "16px",
         p: 1,
         boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
@@ -65,8 +65,8 @@ export default function StepIndicator({ activeStep }) {
             <Box sx={{ display: "flex", alignItems: "center", gap: 0.75 }}>
               <Star
                 size={16}
-                fill={isActive ? "#ffffffff" : "#D3D3D3"}
-                color={isActive ? "#ffffffff" : "#D3D3D3"}
+                fill={isActive ? "#faf6d1ff" : "#c4c2c2ff"}
+                color={isActive ? "#faf6d1ff" : "#c4c2c2ff"}
               />
               <Typography
                 variant="h6"

@@ -1,8 +1,12 @@
 import React from "react";
-import { Box, Typography, Paper, Button, Divider } from "@mui/material";
+import { Box, Typography, Paper, Button, Divider, Stack } from "@mui/material";
+
+// Example icons — replace these with your own asset paths
+import LocationIcon from "../assets/placeholder.jpg";
+import ProfileIcon from "../assets/placeholder.jpg";
+import CalendarIcon from "../assets/placeholder.jpg";
 
 export default function ConfirmStep({ location, profile, dates, onBack }) {
-  // Colors
   const gold = "#F6D76F";
   const lightBg = "#FAF9F6";
   const darkText = "#615b40";
@@ -91,81 +95,69 @@ export default function ConfirmStep({ location, profile, dates, onBack }) {
       }}
     >
       <Typography
-        variant="h6"
+        variant="h5"
         fontWeight={700}
         color={darkText}
+        textAlign="center"
         sx={{ mb: 2 }}
       >
         Confirm your selection!
       </Typography>
 
-      {/* --- LOCATION --- */}
+      {/* --- OUTER WRAPPER --- */}
       <Box
         sx={{
-          backgroundColor: lightBg,
-          borderRadius: "12px",
-          p: 2,
-          mb: 2,
+          backgroundColor: "#F8F6F1",
+          borderRadius: "20px",
+          p: 3,
+          display: "flex",
+          flexDirection: "column",
+          gap: 2.5,
         }}
       >
-        <Typography fontWeight={700} color={darkText}>
-          Location
-        </Typography>
-        <Typography sx={{ whiteSpace: "pre-line", color: darkText }}>
-          {locationText}
-        </Typography>
+        {/* --- LOCATION --- */}
+        <InfoRow
+          icon={LocationIcon}
+          bg={lightBg}
+          title="Location"
+          content={locationText}
+          darkText={darkText}
+        />
+
+        {/* --- PROFILE --- */}
+        <InfoRow
+          icon={ProfileIcon}
+          bg={gold}
+          title={`Profile: ${t.name || profile?.profileName || "Custom Profile"}`}
+          content={
+            <>
+              Temp: {temp[0]}–{temp[1]}°F
+              <br />
+              Precipitation: {t.precip || "—"}
+              <br />
+              Max wind speed: {wind} mph
+              <br />
+              Cloud cover: {t.clouds || t.cloud || "—"}
+              <br />
+              Min AQI: {t.minAQI || t.aqi || "—"}
+              <br />
+              Max humidity: {t.maxHumidity || t.humidity || "—"}
+            </>
+          }
+          darkText={darkText}
+        />
+
+        {/* --- DATES --- */}
+        <InfoRow
+          icon={CalendarIcon}
+          bg={lightBg}
+          title="Dates"
+          content={`${start} → ${end}`}
+          darkText={darkText}
+        />
       </Box>
 
-      {/* --- PROFILE --- */}
-      <Box
-        sx={{
-          backgroundColor: gold,
-          borderRadius: "12px",
-          p: 2,
-          mb: 2,
-        }}
-      >
-        <Typography fontWeight={700} color={darkText}>
-          Profile: {t.name || profile?.profileName || "Custom Profile"}
-        </Typography>
-        <Typography sx={{ color: darkText }}>
-          Temp: {temp[0]}–{temp[1]}°F
-        </Typography>
-        <Typography sx={{ color: darkText }}>
-          Precipitation: {t.precip || "—"}
-        </Typography>
-        <Typography sx={{ color: darkText }}>
-          Max wind speed: {wind} mph
-        </Typography>
-        <Typography sx={{ color: darkText }}>
-          Cloud cover: {t.clouds || t.cloud || "—"}
-        </Typography>
-        <Typography sx={{ color: darkText }}>
-          Min AQI: {t.minAQI || t.aqi || "—"}
-        </Typography>
-        <Typography sx={{ color: darkText }}>
-          Max humidity: {t.maxHumidity || t.humidity || "—"}
-        </Typography>
-      </Box>
-
-      {/* --- DATES --- */}
-      <Box
-        sx={{
-          backgroundColor: lightBg,
-          borderRadius: "12px",
-          p: 2,
-          mb: 3,
-        }}
-      >
-        <Typography fontWeight={720} color={darkText}>
-          Dates
-        </Typography>
-        <Typography color={darkText}>
-          {start} → {end}
-        </Typography>
-      </Box>
-
-      <Divider sx={{ mb: 3 }} />
+      <Divider sx={{ my: 3 }} />
 
       {/* --- BUTTONS --- */}
       <Box
@@ -183,10 +175,10 @@ export default function ConfirmStep({ location, profile, dates, onBack }) {
             color: "#000",
             borderRadius: "12px",
             textTransform: "none",
-            fontWeight: 600,
+            fontWeight: 700,
             px: 4,
             py: 1,
-            "&:hover": { backgroundColor: "#F3CD52" },
+            "&:hover": { backgroundColor: "#C2A64C", color: "#fff" },
           }}
         >
           Back
@@ -194,21 +186,57 @@ export default function ConfirmStep({ location, profile, dates, onBack }) {
 
         <Button
           variant="contained"
+          onClick={handleSubmit}
           sx={{
-            backgroundColor: "#F3CD52",
-            color: "#fff",
-            borderRadius: "20px",
+            backgroundColor: gold,
+            color: "#000",
+            borderRadius: "12px",
             textTransform: "none",
-            fontWeight: 600,
+            fontWeight: 700,
             px: 6,
             py: 1.4,
-            "&:hover": { backgroundColor: "#F3CD52" },
+            "&:hover": { backgroundColor: "#B69944", color: "#fff"},
           }}
-          onClick={handleSubmit}
         >
           SHOW ME MY REPORT!
         </Button>
       </Box>
     </Paper>
+  );
+}
+
+/* --- InfoRow Component with Icon Left + Box Right --- */
+function InfoRow({ icon, title, content, bg, darkText }) {
+  return (
+    <Stack
+      direction="row"
+      alignItems="center"
+      spacing={2}
+      sx={{
+        backgroundColor: bg,
+        borderRadius: "12px",
+        p: 2,
+      }}
+    >
+      <Box
+        component="img"
+        src={icon}
+        alt={`${title} icon`}
+        sx={{
+          width: 40,
+          height: 40,
+          opacity: 0.9,
+          flexShrink: 0,
+        }}
+      />
+      <Box>
+        <Typography fontWeight={700} color={darkText}>
+          {title}
+        </Typography>
+        <Typography sx={{ color: darkText, whiteSpace: "pre-line" }}>
+          {content}
+        </Typography>
+      </Box>
+    </Stack>
   );
 }
