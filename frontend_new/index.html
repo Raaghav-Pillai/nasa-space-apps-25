@@ -1,0 +1,298 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Trip Planner</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+</head>
+<body>
+    <div id="app">
+        <!-- Progress Steps -->
+        <div class="progress-container">
+            <div class="step" id="step-location">
+                <span class="step-icon">ðŸ“</span> Location
+            </div>
+            <div class="step" id="step-profile">
+                <span class="step-icon">ðŸ‘¤</span> Profile
+            </div>
+            <div class="step" id="step-dates">
+                <span class="step-icon">ðŸ“…</span> Dates
+            </div>
+            <div class="step" id="step-confirm">
+                <span class="step-icon">âœ“</span> Confirm
+            </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="content-container">
+            <!-- Step 1: Location -->
+            <div class="step-content" id="content-location">
+                <h2>Choose a location in the US!</h2>
+                <div class="search-container">
+                    <input type="text" id="location-search" placeholder="e.g. Chicago" />
+                    <button id="search-btn">ðŸ”</button>
+                </div>
+                <div id="map"></div>
+                <div class="selected-location" id="selected-location-display">
+                    Selected location: <strong id="location-name">None</strong><br>
+                    <span id="location-coords"></span>
+                </div>
+                <div class="nav-buttons">
+                    <button class="btn-next" onclick="nextStep()">Next</button>
+                </div>
+            </div>
+
+            <!-- Step 2: Profile -->
+            <div class="step-content hidden" id="content-profile">
+                <h2>Select an activity!</h2>
+                <div class="activity-grid">
+                    <div class="activity-card" onclick="selectActivity('beach')">
+                        <div class="activity-number">1</div>
+                        <h3>ðŸ–ï¸ Beach Day</h3>
+                        <p>Prefers warm, sunny conditions</p>
+                        <div class="activity-details">
+                            <span>â˜€ï¸ Sunny</span>
+                            <span>ðŸŒ¡ï¸ 75-90Â°F</span>
+                        </div>
+                    </div>
+                    <div class="activity-card" onclick="selectActivity('hiking')">
+                        <div class="activity-number">2</div>
+                        <h3>ðŸ¥¾ Hiking</h3>
+                        <p>Prefers mid-temperature, cloudy conditions</p>
+                        <div class="activity-details">
+                            <span>â˜ï¸ Cloudy</span>
+                            <span>ðŸŒ¡ï¸ 55-75Â°F</span>
+                        </div>
+                    </div>
+                    <div class="activity-card" onclick="selectActivity('skiing')">
+                        <div class="activity-number">3</div>
+                        <h3>â›·ï¸ Skiing</h3>
+                        <p>Prefers cold, mild conditions</p>
+                        <div class="activity-details">
+                            <span>â„ï¸ Cold</span>
+                            <span>ðŸŒ¡ï¸ 20-40Â°F</span>
+                        </div>
+                    </div>
+                    <div class="activity-card" onclick="selectActivity('rain')">
+                        <div class="activity-number">4</div>
+                        <h3>ðŸŒ§ï¸ Rain Dancing</h3>
+                        <p>Prefers mid-temperature, rainy conditions</p>
+                        <div class="activity-details">
+                            <span>ðŸŒ§ï¸ Rainy</span>
+                            <span>ðŸŒ¡ï¸ 60-75Â°F</span>
+                        </div>
+                    </div>
+                    <div class="activity-card" onclick="selectActivity('sailing')">
+                        <div class="activity-number">5</div>
+                        <h3>â›µ Sailing</h3>
+                        <p>Prefers warm, windy conditions</p>
+                        <div class="activity-details">
+                            <span>ðŸ’¨ Windy</span>
+                            <span>ðŸŒ¡ï¸ 65-80Â°F</span>
+                        </div>
+                    </div>
+                    <div class="activity-card" onclick="selectActivity('custom')">
+                        <div class="activity-number">6</div>
+                        <h3>âš™ï¸ Custom</h3>
+                        <p>Create your own conditions!</p>
+                    </div>
+                </div>
+                
+                <!-- Custom Profile Form -->
+                <div class="custom-profile hidden" id="custom-profile-form">
+                    <h3>Create your profile...</h3>
+                    <div class="form-group">
+                        <label>ðŸŒ¡ï¸ Ideal Temperature Range: <span id="temp-range-display">50-65Â°F</span></label>
+                        <div class="range-inputs">
+                            <input type="range" id="temp-min" min="0" max="110" value="50" oninput="updateTempRange()">
+                            <input type="range" id="temp-max" min="0" max="110" value="65" oninput="updateTempRange()">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>ðŸŒ§ï¸ Precipitation:</label>
+                        <div class="radio-group">
+                            <label><input type="radio" name="precip" value="none" checked> No chances of rain!</label>
+                            <label><input type="radio" name="precip" value="drizzle"> A drizzle is okay</label>
+                            <label><input type="radio" name="precip" value="any"> Any conditions!</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>ðŸ’¨ Max Wind Speed: <span id="wind-display">30 mph</span></label>
+                        <input type="range" id="wind-speed" min="0" max="50" value="30" oninput="updateWindSpeed()">
+                    </div>
+                    <div class="form-group">
+                        <label>â˜ï¸ Cloud Cover:</label>
+                        <div class="radio-group">
+                            <label><input type="radio" name="clouds" value="clear" checked> Clear skies only</label>
+                            <label><input type="radio" name="clouds" value="light"> Lightly Cloudy</label>
+                            <label><input type="radio" name="clouds" value="cloudy"> Cloudy</label>
+                            <label><input type="radio" name="clouds" value="any"> Any conditions!</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>ðŸ’§ Max Humidity: <span id="humidity-display">87%</span></label>
+                        <input type="range" id="humidity" min="0" max="100" value="87" oninput="updateHumidity()">
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="profile-name" placeholder="Save as 'My perfect hike...'" />
+                    </div>
+                </div>
+
+                <div class="nav-buttons">
+                    <button class="btn-back" onclick="prevStep()">Back</button>
+                    <button class="btn-preset" onclick="showPresets()">Preset Profiles</button>
+                    <button class="btn-next" onclick="nextStep()">Next</button>
+                </div>
+            </div>
+
+            <!-- Step 3: Dates -->
+            <div class="step-content hidden" id="content-dates">
+                <h2>Select your dates!</h2>
+                
+                <div class="date-mode-selector">
+                    <button class="btn-mode active" onclick="setDateMode('single')">Just one!</button>
+                    <button class="btn-mode" onclick="setDateMode('range')">Multiple!</button>
+                </div>
+
+                <div id="single-date-picker" class="date-picker-container">
+                    <label>From:</label>
+                    <input type="date" id="single-date" />
+                    <label>Enter time:</label>
+                    <input type="time" id="single-time" value="20:00" />
+                </div>
+
+                <div id="range-date-picker" class="date-picker-container hidden">
+                    <div class="date-range-inputs">
+                        <div>
+                            <label>Start Date:</label>
+                            <input type="date" id="start-date" />
+                        </div>
+                        <div>
+                            <label>End Date:</label>
+                            <input type="date" id="end-date" />
+                        </div>
+                    </div>
+                    <button class="btn-general" onclick="showGeneralOptions()">I'd like more general options.</button>
+                </div>
+
+                <!-- General Date Options -->
+                <div id="general-date-options" class="hidden">
+                    <div class="general-selects">
+                        <select id="week-select">
+                            <option value="">Select</option>
+                            <option value="first">First week of</option>
+                            <option value="second">Second week of</option>
+                            <option value="third">Third week of</option>
+                            <option value="last">Last week of</option>
+                            <option value="first-two">First two weeks of</option>
+                            <option value="last-two">Last two weeks of</option>
+                            <option value="full">Full month of</option>
+                        </select>
+                        <select id="month-select">
+                            <option value="">Select month</option>
+                            <option value="1">January</option>
+                            <option value="2">February</option>
+                            <option value="3">March</option>
+                            <option value="4">April</option>
+                            <option value="5">May</option>
+                            <option value="6">June</option>
+                            <option value="7">July</option>
+                            <option value="8">August</option>
+                            <option value="9">September</option>
+                            <option value="10">October</option>
+                            <option value="11">November</option>
+                            <option value="12">December</option>
+                        </select>
+                    </div>
+                    <button class="btn-general" onclick="hideGeneralOptions()">I'd like specific dates.</button>
+                </div>
+
+                <div class="nav-buttons">
+                    <button class="btn-back" onclick="prevStep()">Back</button>
+                    <button class="btn-next" onclick="nextStep()">Next</button>
+                </div>
+            </div>
+
+            <!-- Step 4: Confirm -->
+            <div class="step-content hidden" id="content-confirm">
+                <h2>Confirm your selection!</h2>
+                
+                <div class="confirmation-summary">
+                    <div class="summary-card location-card">
+                        <h3>ðŸ“ Location</h3>
+                        <p id="confirm-location">West Loop, Chicago, 60607</p>
+                        <p id="confirm-coords">41.8831Â° N, 87.6521Â° W</p>
+                    </div>
+                    
+                    <div class="summary-card profile-card">
+                        <h3>ðŸ‘¤ Profile: <span id="confirm-profile-name">Profile Name</span></h3>
+                        <p id="confirm-profile-details">
+                            Temp: 50-65<br>
+                            Precipitation: none<br>
+                            Maximum wind speed: 20 mph<br>
+                            Cloud cover: sunny<br>
+                            Minimum AQI: 94<br>
+                            Maximum humidity: 87
+                        </p>
+                    </div>
+                    
+                    <div class="summary-card dates-card">
+                        <h3>ðŸ“… Dates</h3>
+                        <p id="confirm-dates">MM/DD/YYYY - MM/DD/YYYY</p>
+                    </div>
+                </div>
+
+                <button class="btn-report" onclick="generateReport()">Show me my report!</button>
+
+                <div class="nav-buttons">
+                    <button class="btn-back" onclick="prevStep()">Back</button>
+                </div>
+            </div>
+
+            <!-- Results Page -->
+            <div class="step-content hidden" id="content-results">
+                <h2>Your Weather Report</h2>
+                <div id="loading" class="loading">
+                    <div class="spinner"></div>
+                    <p>Analyzing weather data...</p>
+                </div>
+                <div id="results-container" class="hidden"></div>
+                <button class="btn-back" onclick="resetApp()">Start Over</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Chatbot -->
+    <div id="chatbot-container" class="chatbot-container">
+        <div class="chatbot-header">
+            <h3>🤖 AI Trip Planner</h3>
+            <button id="chatbot-toggle" class="chatbot-toggle-btn">−</button>
+        </div>
+        <div id="chatbot-body" class="chatbot-body">
+            <div id="chat-messages" class="chat-messages">
+                <div class="chat-message bot-message">
+                    <div class="message-content">
+                        👋 Hi! I'm your AI trip planning assistant. I can help you:
+                        <ul>
+                            <li>Plan activities based on weather forecasts</li>
+                            <li>Find local events at your destination</li>
+                            <li>Suggest indoor alternatives for bad weather</li>
+                            <li>Create personalized itineraries</li>
+                        </ul>
+                        Ask me anything about your trip!
+                    </div>
+                </div>
+            </div>
+            <div class="chat-input-container">
+                <input type="text" id="chat-input" placeholder="Ask about weather, events, or activities..." />
+                <button id="chat-send" class="chat-send-btn">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="azure-api-config.js"></script>`n    <script src="app.js"></script>
+</body>
+</html>

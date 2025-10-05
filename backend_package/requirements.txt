@@ -1,0 +1,14 @@
+azure-functions
+azure-storage-blob
+azure-search-documents
+elasticsearch
+requests
+xarray
+pandas
+matplotlib
+netCDF4
+joblib
+scikit-learn
+numpy
+fastapi
+uvicorn

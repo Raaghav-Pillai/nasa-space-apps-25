@@ -1,9 +1,22 @@
-FROM mcr.microsoft.com/azure-functions/python:4-python3.9
+FROM python:3.10-slim
 
-ENV AzureWebJobsScriptRoot=/home/site/wwwroot \
-    AzureFunctionsJobHost__Logging__Console__IsEnabled=true
+WORKDIR /app
 
-COPY requirements.txt /
-RUN pip install -r /requirements.txt
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    gcc \
+    g++ \
+    && rm -rf /var/lib/apt/lists/*
 
-COPY . /home/site/wwwroot/
+# Copy requirements
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy application
+COPY . .
+
+# Expose port
+EXPOSE 8000
+
+# Run the application
+CMD ["uvicorn", "api_server:app", "--host", "0.0.0.0", "--port", "8000"]

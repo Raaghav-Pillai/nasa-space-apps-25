@@ -1,0 +1,13 @@
+﻿Azure Deployment Complete
+========================
+Date: 10/04/2025 22:05:25
+Resource Group: nasa-weather-hackathon
+Frontend: https://orange-coast-0614e430f.2.azurestaticapps.net
+Backend: http://:8000
+Container: weather-api-backend
+Registry: weatherreg6282
+
+Next Steps:
+1. Test backend: curl http://:8000/health
+2. Open frontend: https://orange-coast-0614e430f.2.azurestaticapps.net
+3. Setup Elasticsearch: python index_to_elasticsearch.py
