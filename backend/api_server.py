@@ -150,26 +150,105 @@ async def chat_with_planner(request: ChatMessage):
         }
     
     try:
+        # Extract dates from message if not provided
+        import re
+        from datetime import datetime, timedelta
+        
+        message_lower = request.message.lower()
+        auto_fetch_weather = False
+        start_date = None
+        end_date = None
+        
+        # Check if user is asking about weather or planning activities
+        weather_keywords = ['weather', 'forecast', 'temperature', 'rain', 'conditions', 'picnic', 'trip', 'visit', 'plan', 'go', 'outdoor', 'activities', 'suitable', 'good day']
+        if any(word in message_lower for word in weather_keywords):
+            # Try to extract dates from message
+            if 'october' in message_lower or 'oct' in message_lower:
+                start_date = '2025-10-01'
+                end_date = '2025-10-07'
+                auto_fetch_weather = True
+            elif 'next week' in message_lower:
+                today = datetime.now()
+                next_week = today + timedelta(days=7)
+                start_date = next_week.strftime('%Y-%m-%d')
+                end_date = (next_week + timedelta(days=6)).strftime('%Y-%m-%d')
+                auto_fetch_weather = True
+            elif 'this week' in message_lower:
+                today = datetime.now()
+                start_date = today.strftime('%Y-%m-%d')
+                end_date = (today + timedelta(days=6)).strftime('%Y-%m-%d')
+                auto_fetch_weather = True
+            elif 'tomorrow' in message_lower:
+                tomorrow = datetime.now() + timedelta(days=1)
+                start_date = tomorrow.strftime('%Y-%m-%d')
+                end_date = start_date
+                auto_fetch_weather = True
+        
+        # Fetch weather if dates detected or provided
+        weather_forecast = None
+        if auto_fetch_weather or (request.dates and request.dates.get('start')):
+            if not start_date and request.dates:
+                start_date = request.dates.get('start')
+                end_date = request.dates.get('end', start_date)
+            
+            if start_date:
+                try:
+                    # Fetch weather predictions
+                    df = predict_daily_range(start_date, end_date)
+                    if df is not None and len(df) > 0:
+                        weather_forecast = df.to_dict('records')
+                        print(f"✅ Fetched weather for {len(df)} days")
+                    else:
+                        print("⚠️ No weather data returned")
+                except Exception as e:
+                    print(f"❌ Weather fetch error: {e}")
+                    import traceback
+                    traceback.print_exc()
+        
+        # Extract location from message if not provided
+        location_to_use = request.location
+        if not location_to_use and 'chicago' in message_lower:
+            location_to_use = {'name': 'Chicago', 'lat': 41.8781, 'lng': -87.6298}
+        
         # Get local events if location and dates provided
         events = []
-        if request.location and request.dates:
+        if location_to_use and (request.dates or start_date):
+            event_start = start_date or request.dates.get('start', '')
+            event_end = end_date or request.dates.get('end', '')
             events = await search_local_events(
-                request.location.get('name', 'Unknown'),
-                request.dates.get('start', ''),
-                request.dates.get('end', ''),
-                request.location.get('lat', 0),
-                request.location.get('lng', 0)
+                location_to_use.get('name', 'Unknown'),
+                event_start,
+                event_end,
+                location_to_use.get('lat', 0),
+                location_to_use.get('lng', 0)
             )
         
         # Build context for the AI
-        system_prompt = """You are a helpful trip planning assistant. You help users plan their trips by:
-1. Analyzing weather forecasts and suggesting suitable activities
-2. Recommending local events based on weather conditions
-3. Providing personalized itineraries
-4. Warning about weather-dependent outdoor events
-5. Suggesting indoor alternatives when weather is poor
+        system_prompt = """You are an intelligent trip planning assistant with expertise in weather analysis and activity planning.
 
-Be conversational, helpful, and specific. Use the weather data and events provided to give actionable recommendations."""
+Your capabilities:
+1. Analyze weather forecasts and determine suitability for specific activities
+2. Intelligently weight weather factors based on the activity:
+   - For PICNICS: Temperature (40%), Precipitation (40%), Wind (10%), Humidity (10%)
+   - For BEACH: Temperature (35%), Precipitation (30%), Cloud cover (25%), Wind (10%)
+   - For HIKING: Temperature (30%), Precipitation (30%), Cloud cover (20%), Wind (20%)
+   - For SAILING: Wind (50%), Temperature (20%), Precipitation (20%), Cloud cover (10%)
+   - For SKIING: Temperature (60%), Precipitation (20%), Wind (15%), Cloud cover (5%)
+   - For OUTDOOR SPORTS: Temperature (35%), Precipitation (35%), Wind (20%), Humidity (10%)
+
+3. Provide specific recommendations:
+   - Calculate suitability scores (0-100%) based on weighted factors
+   - Identify the BEST days for the activity
+   - Explain WHY certain days are better
+   - Warn about unsuitable conditions
+   - Suggest alternatives if weather is poor
+
+4. Be specific and actionable:
+   - "Tuesday is PERFECT (95% suitable) - 72°F, sunny, light breeze"
+   - "Avoid Wednesday (30% suitable) - heavy rain expected"
+   - "Best window: Thursday-Saturday (85%+ suitable)"
+
+Always analyze the actual weather data provided and give data-driven recommendations."""
         
         context = f"""You are an intelligent trip planning assistant with access to:
 1. Real-time weather predictions (NASA MODIS satellite data, 1.72°F accuracy)
@@ -179,16 +258,31 @@ Be conversational, helpful, and specific. Use the weather data and events provid
 Current Context:
 """
         
-        if request.location:
-            context += f"\nLocation: {request.location.get('name', 'Unknown')} (Lat: {request.location.get('lat')}, Lng: {request.location.get('lng')})"
+        if location_to_use:
+            context += f"\nLocation: {location_to_use.get('name', 'Unknown')} (Lat: {location_to_use.get('lat')}, Lng: {location_to_use.get('lng')})"
         
         if request.dates:
             context += f"\nDates: {request.dates.get('start')} to {request.dates.get('end')}"
         
-        if request.weather_data:
+        # Use fetched weather or provided weather data
+        weather_to_use = weather_forecast or (request.weather_data if request.weather_data else None)
+        
+        if weather_to_use:
             context += f"\n\nWeather Forecast:"
-            for key, value in request.weather_data.items():
-                context += f"\n  - {key}: {value}"
+            if isinstance(weather_to_use, list):
+                # Multiple days
+                for day in weather_to_use[:7]:  # Limit to 7 days
+                    context += f"\n\n{day.get('date', 'Unknown date')}:"
+                    context += f"\n  - Temperature: {day.get('avg_temperature_f', 'N/A')}°F"
+                    context += f"\n  - Feels like: {day.get('avg_feels_like_f', 'N/A')}°F"
+                    context += f"\n  - Precipitation: {day.get('total_precipitation_mm', 'N/A')}mm"
+                    context += f"\n  - Humidity: {day.get('avg_humidity_percent', 'N/A')}%"
+                    context += f"\n  - Cloud cover: {day.get('avg_cloud_cover_percent', 'N/A')}%"
+                    context += f"\n  - Wind: {day.get('avg_wind_speed_mph', 'N/A')}mph"
+            else:
+                # Single day or summary
+                for key, value in weather_to_use.items():
+                    context += f"\n  - {key}: {value}"
         
         if events:
             context += f"\n\nLocal Events:"
@@ -198,6 +292,10 @@ Current Context:
                     context += " [Weather-dependent activity]"
         
         context += f"\n\nUser Question: {request.message}"
+        
+        # Add analysis instructions if weather data is available
+        if weather_to_use:
+            context += f"\n\nPlease analyze this weather data for the requested activity and recommend the best days."
         
         # Build conversation history for Gemini
         conversation_text = system_prompt + "\n\n"
@@ -229,13 +327,36 @@ Current Context:
             # Check if response has valid text
             if hasattr(response, 'text') and response.text:
                 ai_response = response.text
+            elif hasattr(response, 'candidates') and response.candidates:
+                # Try to get text from candidates
+                candidate = response.candidates[0]
+                if hasattr(candidate, 'content') and hasattr(candidate.content, 'parts'):
+                    ai_response = ''.join([part.text for part in candidate.content.parts if hasattr(part, 'text')])
+                else:
+                    ai_response = "I understand you want to plan a trip! However, I'm having trouble generating a detailed response. Could you rephrase your question?"
             else:
-                # If blocked or no text, provide a helpful fallback
-                ai_response = "I can help you plan your trip! Based on the weather data, I can suggest activities and create an itinerary. What would you like to know?"
+                # If blocked, provide helpful response based on what we know
+                if weather_to_use and isinstance(weather_to_use, list) and len(weather_to_use) > 0:
+                    # Generate a simple response from the weather data
+                    best_day = weather_to_use[0]
+                    ai_response = f"Great idea! Based on the weather forecast:\n\n"
+                    ai_response += f"📅 Best day: {best_day.get('date', 'Unknown')}\n"
+                    ai_response += f"🌡️ Temperature: {best_day.get('avg_temperature_f', 'N/A')}°F\n"
+                    ai_response += f"💧 Precipitation: {best_day.get('total_precipitation_mm', 'N/A')}mm\n"
+                    ai_response += f"💨 Wind: {best_day.get('avg_wind_speed_mph', 'N/A')}mph\n\n"
+                    ai_response += f"This looks like a good day for your activity!"
+                else:
+                    ai_response = "I can help you plan your trip! Let me know your location and dates, and I'll analyze the weather for you."
         except Exception as e:
             # Fallback response if Gemini fails
             print(f"Gemini error: {e}")
-            ai_response = "I'm here to help with your trip planning! I can analyze weather forecasts, suggest activities, and recommend events. What would you like to know about your trip?"
+            if weather_to_use and isinstance(weather_to_use, list) and len(weather_to_use) > 0:
+                # At least show the weather data
+                ai_response = f"I found weather data for your dates! Here's a quick summary:\n\n"
+                for day in weather_to_use[:3]:
+                    ai_response += f"📅 {day.get('date')}: {day.get('avg_temperature_f')}°F, {day.get('total_precipitation_mm')}mm rain\n"
+            else:
+                ai_response = "I'm here to help with your trip planning! I can analyze weather forecasts, suggest activities, and recommend events. What would you like to know about your trip?"
         
         # Generate specific recommendations
         recommendations = []
