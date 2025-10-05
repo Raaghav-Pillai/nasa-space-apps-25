@@ -1,97 +1,85 @@
 import React from "react";
 import { Box, Typography } from "@mui/material";
-import { motion } from "framer-motion";
-
-/**
- * Figma-accurate Step Bar
- * - Equal-width tabs
- * - Active tab = #F6D76F background, black text
- * - Inactive tabs = #F9F8F4 background, gray text
- * - Smooth animated highlight bar across the top
- * - Rounded ends + subtle elevation
- */
-
-const steps = ["Location", "Profile", "Dates", "Confirm"];
+import { Star } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function StepIndicator({ activeStep }) {
-  const stepWidth = 100 / steps.length;
+  const steps = ["Location", "Profile", "Dates", "Confirm"];
 
   return (
     <Box
       sx={{
-        position: "relative",
-        width: "100%",
-        borderRadius: "12px",
-        boxShadow: "0px 1px 3px rgba(0,0,0,0.1)",
-        overflow: "hidden",
-        backgroundColor: "#F9F8F4",
         display: "flex",
-        justifyContent: "space-between",
+        justifyContent: "center",
         alignItems: "center",
+        backgroundColor: "#FFFFFF",
+        borderRadius: "16px",
+        p: 1,
+        boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
+        position: "relative",
       }}
     >
-      {/* Animated yellow background */}
-      <motion.div
-        layout
-        initial={false}
-        animate={{
-          left: `${activeStep * stepWidth}%`,
-        }}
-        transition={{
-          type: "spring",
-          stiffness: 350,
-          damping: 35,
-        }}
-        style={{
+      {/* Animated background pill */}
+      <Box
+        sx={{
           position: "absolute",
-          top: 0,
-          left: 0,
-          width: `${stepWidth}%`,
-          height: "100%",
-          backgroundColor: "#F6D76F",
+          top: 6,
+          bottom: 6,
+          left: `${activeStep * 25}%`,
+          width: "25%",
           borderRadius: "12px",
-          zIndex: 0,
+          backgroundColor: "#F6D76F",
+          transition: "left 0.4s cubic-bezier(0.25, 1, 0.5, 1)",
+          zIndex: 1,
         }}
       />
 
-      {/* Step labels */}
       {steps.map((label, index) => {
         const isActive = index === activeStep;
-        const isFirst = index === 0;
-        const isLast = index === steps.length - 1;
 
         return (
           <Box
             key={label}
             sx={{
               flex: 1,
-              textAlign: "center",
-              py: 1.5,
               position: "relative",
-              borderRight:
-                index !== steps.length - 1
-                  ? "1px solid rgba(0,0,0,0.07)"
-                  : "none",
-              borderTopLeftRadius: isFirst ? "12px" : 0,
-              borderBottomLeftRadius: isFirst ? "12px" : 0,
-              borderTopRightRadius: isLast ? "12px" : 0,
-              borderBottomRightRadius: isLast ? "12px" : 0,
-              zIndex: 1,
+              borderRadius:
+                index === 0
+                  ? "12px 0 0 12px"
+                  : index === steps.length - 1
+                  ? "0 12px 12px 0"
+                  : 0,
+              backgroundColor: "transparent",
+              color: isActive ? "#ffffffff" : "#8A8A8A",
+              textTransform: "none",
+              fontWeight: 700,
+              py: 1.8,
+              transition: "color 0.2s ease-in-out",
+              pointerEvents: "none", // disable clicks
+              zIndex: 2, // sits above pill
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
             }}
           >
-            <Typography
-              variant="body1"
-              sx={{
-                color: isActive ? "#000000" : "#6F6F6F",
-                fontWeight: isActive ? 600 : 500,
-                fontFamily: '"Roboto","Noto Sans",sans-serif',
-                letterSpacing: 0.15,
-                userSelect: "none",
-                transition: "color 0.3s ease",
-              }}
-            >
-              {label}
-            </Typography>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 0.75 }}>
+              <Star
+                size={16}
+                fill={isActive ? "#ffffffff" : "#D3D3D3"}
+                color={isActive ? "#ffffffff" : "#D3D3D3"}
+              />
+              <Typography
+                variant="h6"
+                sx={{
+                  fontWeight: 700,
+                  fontFamily: "Roboto, sans-serif",
+                  letterSpacing: "0.02em",
+                  color: isActive ? "#ffffffff" : "#8A8A8A",
+                }}
+              >
+                {label}
+              </Typography>
+            </Box>
           </Box>
         );
       })}

@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import dayjs from 'dayjs';
+import React, { useEffect, useState } from "react";
+import dayjs from "dayjs";
 import {
   Box,
   Button,
@@ -9,25 +9,26 @@ import {
   MenuItem,
   FormControl,
   InputLabel,
-} from '@mui/material';
-import { DatePicker, TimePicker } from '@mui/x-date-pickers';
-import { computeGeneralPeriod, timeToHHMMSS } from '../utils/dateUtils.js';
+} from "@mui/material";
+import { DatePicker, TimePicker } from "@mui/x-date-pickers";
+import { computeGeneralPeriod, timeToHHMMSS } from "../utils/dateUtils.js";
 
 export default function DatesStep({ dates, setDates, onBack, onNext }) {
+  /* ---------------- Initialization ---------------- */
   useEffect(() => {
     if (!dates || !dates.subPage) {
       setDates((prev) => {
         if (prev?.subPage) return prev;
-        return { ...prev, subPage: 'choice', mode: 'single' };
+        return { ...prev, subPage: "choice", mode: "single" };
       });
     }
   }, [dates, setDates]);
 
   const goto = (subPage) => setDates((prev) => ({ ...prev, subPage }));
 
-  const gold = '#ebcb6b';
-  const goldHover = '#e1c25c';
-  const darkText = '#615b40';
+  const gold = "#ebcb6b";
+  const goldHover = "#e1c25c";
+  const darkText = "#615b40";
 
   /* ---------------- PAGE 4: CHOICE ---------------- */
   const Page4Choice = () => (
@@ -36,8 +37,8 @@ export default function DatesStep({ dates, setDates, onBack, onNext }) {
         Would you like to plan for one day or multiple?
       </Typography>
       <Stack direction="row" spacing={3}>
-        <GoldButton onClick={() => goto('single')}>Just one!</GoldButton>
-        <GoldButton onClick={() => goto('specific')}>Multiple!</GoldButton>
+        <GoldButton onClick={() => goto("single")}>Just one!</GoldButton>
+        <GoldButton onClick={() => goto("specific")}>Multiple!</GoldButton>
       </Stack>
     </CenteredBox>
   );
@@ -49,14 +50,14 @@ export default function DatesStep({ dates, setDates, onBack, onNext }) {
     const [saved, setSaved] = useState(false);
 
     const handleSave = () => {
-      if (!start || !end) return alert('Please pick both start and end dates.');
+      if (!start || !end) return alert("Please pick both start and end dates.");
       setDates((prev) => ({
         ...prev,
-        startDate: start.format('YYYY-MM-DD'),
-        endDate: end.format('YYYY-MM-DD'),
-        startTime: '00:00:00',
-        endTime: '23:59:59',
-        mode: 'multi',
+        startDate: start.format("YYYY-MM-DD"),
+        endDate: end.format("YYYY-MM-DD"),
+        startTime: "00:00:00",
+        endTime: "23:59:59",
+        mode: "multi",
       }));
       setSaved(true);
       setTimeout(() => setSaved(false), 2500);
@@ -67,6 +68,7 @@ export default function DatesStep({ dates, setDates, onBack, onNext }) {
         <Typography variant="h6" fontWeight={700} color={darkText}>
           Select your date range!
         </Typography>
+
         <Stack direction="row" spacing={2} mt={2}>
           <DatePicker
             label="From"
@@ -88,29 +90,15 @@ export default function DatesStep({ dates, setDates, onBack, onNext }) {
           />
         </Stack>
 
-        <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mt: 3 }}>
+<Stack direction="row" spacing={1.5} alignItems="center" sx={{ mt: 3 }}>
+        <Box sx={{ display: "flex", justifyContent: "center", mt: 3 }}>
           <GoldButton onClick={handleSave}>Save</GoldButton>
-          <Typography
-  variant="body1"
-  sx={{
-    color: '#2e7d32',
-    fontWeight: 600,
-    transition: 'opacity 0.4s ease',
-    opacity: saved ? 1 : 0,
-  }}
->
-  {'\u2713'} Saved
-</Typography>
-
+        </Box>
         </Stack>
-
+        {/* Unified outlined buttons */}
         <Stack direction="row" spacing={2} mt={2}>
-          <Button variant="outlined" onClick={() => goto('general')} sx={{ borderColor: gold, color: darkText }}>
-            General options
-          </Button>
-          <Button variant="outlined" onClick={() => goto('single')} sx={{ borderColor: gold, color: darkText }}>
-            Just one day
-          </Button>
+          <OutlineButton onClick={() => goto("general")}>General options</OutlineButton>
+          <OutlineButton onClick={() => goto("single")}>Just one day</OutlineButton>
         </Stack>
       </CenteredBox>
     );
@@ -119,7 +107,7 @@ export default function DatesStep({ dates, setDates, onBack, onNext }) {
   /* ---------------- PAGE 6: GENERAL ---------------- */
   const Page6General = () => {
     const today = dayjs();
-    const [period, setPeriod] = useState(dates.general?.period || 'first_week');
+    const [period, setPeriod] = useState(dates.general?.period || "first_week");
     const [monthIndex, setMonthIndex] = useState(dates.general?.monthIndex ?? today.month());
     const [year, setYear] = useState(dates.general?.year ?? today.year());
     const [saved, setSaved] = useState(false);
@@ -131,9 +119,9 @@ export default function DatesStep({ dates, setDates, onBack, onNext }) {
         general: { period, monthIndex, year },
         startDate: start,
         endDate: end,
-        startTime: '00:00:00',
-        endTime: '23:59:59',
-        mode: 'multi',
+        startTime: "00:00:00",
+        endTime: "23:59:59",
+        mode: "multi",
       }));
       setSaved(true);
       setTimeout(() => setSaved(false), 2500);
@@ -180,7 +168,7 @@ export default function DatesStep({ dates, setDates, onBack, onNext }) {
             >
               {Array.from({ length: 12 }).map((_, i) => (
                 <MenuItem key={i} value={i}>
-                  {dayjs().month(i).format('MMMM')}
+                  {dayjs().month(i).format("MMMM")}
                 </MenuItem>
               ))}
             </Select>
@@ -206,29 +194,16 @@ export default function DatesStep({ dates, setDates, onBack, onNext }) {
           </FormControl>
         </Stack>
 
-        <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mt: 3 }}>
+<Stack direction="row" spacing={1.5} alignItems="center" sx={{ mt: 3 }}>
+        <Box sx={{ display: "flex", justifyContent: "center", mt: 3 }}>
           <GoldButton onClick={handleSave}>Save</GoldButton>
-         <Typography
-  variant="body1"
-  sx={{
-    color: '#2e7d32',
-    fontWeight: 600,
-    transition: 'opacity 0.4s ease',
-    opacity: saved ? 1 : 0,
-  }}
->
-  {'\u2713'} Saved
-</Typography>
-
+        </Box>
         </Stack>
 
+        {/* Unified outlined buttons */}
         <Stack direction="row" spacing={2} mt={3}>
-          <Button variant="outlined" onClick={() => goto('specific')} sx={{ borderColor: gold, color: darkText }}>
-            Specific dates
-          </Button>
-          <Button variant="outlined" onClick={() => goto('single')} sx={{ borderColor: gold, color: darkText }}>
-            Just one day
-          </Button>
+          <OutlineButton onClick={() => goto("specific")}>Specific dates</OutlineButton>
+          <OutlineButton onClick={() => goto("single")}>Just one day</OutlineButton>
         </Stack>
       </CenteredBox>
     );
@@ -243,14 +218,14 @@ export default function DatesStep({ dates, setDates, onBack, onNext }) {
     const [saved, setSaved] = useState(false);
 
     const handleSave = () => {
-      if (!date) return alert('Please pick a date.');
+      if (!date) return alert("Please pick a date.");
       setDates((prev) => ({
         ...prev,
-        startDate: date.format('YYYY-MM-DD'),
-        startTime: timeToHHMMSS(time.format('HH:mm:ss')),
-        endDate: date.format('YYYY-MM-DD'),
-        endTime: timeToHHMMSS(time.format('HH:mm:ss')),
-        mode: 'single',
+        startDate: date.format("YYYY-MM-DD"),
+        startTime: timeToHHMMSS(time.format("HH:mm:ss")),
+        endDate: date.format("YYYY-MM-DD"),
+        endTime: timeToHHMMSS(time.format("HH:mm:ss")),
+        mode: "single",
       }));
       setSaved(true);
       setTimeout(() => setSaved(false), 2500);
@@ -261,6 +236,7 @@ export default function DatesStep({ dates, setDates, onBack, onNext }) {
         <Typography variant="h6" fontWeight={700} color={darkText}>
           Select your date and time!
         </Typography>
+
         <Stack direction="row" spacing={2} mt={2} alignItems="flex-end">
           <DatePicker
             label="Date"
@@ -278,56 +254,70 @@ export default function DatesStep({ dates, setDates, onBack, onNext }) {
               setTime(v);
               setSaved(false);
             }}
-            views={['hours', 'minutes', 'seconds']}
+            views={["hours", "minutes", "seconds"]}
             slotProps={{ textField: { fullWidth: true } }}
           />
         </Stack>
 
-        <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mt: 3 }}>
+        <Box sx={{ display: "flex", justifyContent: "center", mt: 3 }}>
           <GoldButton onClick={handleSave}>Save</GoldButton>
-          <Typography
-  variant="body1"
-  sx={{
-    color: '#2e7d32',
-    fontWeight: 600,
-    transition: 'opacity 0.4s ease',
-    opacity: saved ? 1 : 0,
-  }}
->
-  {'\u2713'} Saved
-</Typography>
+        </Box>
 
-        </Stack>
+        <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
+          <OutlineButton onClick={() => goto("specific")}>
+            I’d like to select a range of dates.
+          </OutlineButton>
+        </Box>
 
-        <Button
-          variant="outlined"
-          sx={{ mt: 2, borderColor: gold, color: darkText }}
-          onClick={() => goto('specific')}
+        <Typography
+          variant="body1"
+          sx={{
+            mt: 2,
+            color: "#2e7d32",
+            fontWeight: 600,
+            transition: "opacity 0.4s ease",
+            opacity: saved ? 1 : 0,
+          }}
         >
-          I’d like to pick a range
-        </Button>
+          {"\u2713"} Saved
+        </Typography>
       </CenteredBox>
     );
   };
 
-  /* ---------------- RENDER ---------------- */
+  /* ---------------- Container ---------------- */
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '80vh', justifyContent: 'space-between' }}>
-      <Box sx={{ flexGrow: 1 }}>
-        {dates.subPage === 'choice' && <Page4Choice />}
-        {dates.subPage === 'specific' && <Page5Specific />}
-        {dates.subPage === 'general' && <Page6General />}
-        {dates.subPage === 'single' && <Page7Single />}
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+        width: "100%",
+        maxWidth: 900,
+        mx: "auto",
+        p: 4,
+        borderRadius: "16px",
+        backgroundColor: "#FFFFFF",
+        minHeight: "30vh",
+        boxShadow: "0 3px 10px rgba(0,0,0,0.05)",
+      }}
+    >
+      <Box sx={{ width: "100%", display: "flex", justifyContent: "center", alignItems: "center", flexGrow: 1 }}>
+        {dates.subPage === "choice" && <Page4Choice />}
+        {dates.subPage === "specific" && <Page5Specific />}
+        {dates.subPage === "general" && <Page6General />}
+        {dates.subPage === "single" && <Page7Single />}
       </Box>
 
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 4 }}>
+      <Box sx={{ display: "flex", justifyContent: "space-between", width: "100%", mt: 3 }}>
         <GoldButton onClick={onBack}>Back</GoldButton>
         <GoldButton
           onClick={onNext}
           disabled={!dates.startDate || !dates.endDate}
           sx={{
             opacity: !dates.startDate || !dates.endDate ? 0.6 : 1,
-            cursor: !dates.startDate || !dates.endDate ? 'not-allowed' : 'pointer',
+            cursor: !dates.startDate || !dates.endDate ? "not-allowed" : "pointer",
           }}
         >
           Next
@@ -336,38 +326,77 @@ export default function DatesStep({ dates, setDates, onBack, onNext }) {
     </Box>
   );
 
-  /* ---------------- Reusable components ---------------- */
-  function CenteredBox({ children }) {
-    return (
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          textAlign: 'center',
-          minHeight: '70vh',
-          gap: 3,
-        }}
-      >
-        {children}
-      </Box>
-    );
-  }
+  /* ---------------- Reusable Components ---------------- */
+function CenteredBox({ children }) {
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        textAlign: "center",
+        width: "100%",
+        maxWidth: 600,
+        mx: "auto",
+        py: 2,
+        position: "relative",
+        "& .MuiFormControl-root": {
+          mx: "auto",
+          display: "block",
+          textAlign: "center",
+        },
+        "& .MuiInputBase-root, & .MuiSelect-select, & .MuiOutlinedInput-root": {
+          textAlign: "center", // centers dropdown text too
+        },
+      }}
+    >
+      {children}
+    </Box>
+  );
+}
 
-  function GoldButton({ children, sx, ...props }) {
+function GoldButton({ children, sx, ...props }) {
     return (
       <Button
         variant="contained"
+        disableElevation
         sx={{
-          backgroundColor: gold,
-          color: '#fff',
-          borderRadius: 2,
+          backgroundColor: "#C2A64C",
+          color: "#FFFFFF",
+          borderRadius: "12px",
           px: 4,
-          py: 1.2,
-          textTransform: 'none',
-          fontWeight: 500,
-          '&:hover': { backgroundColor: goldHover },
+          py: 1.1,
+          textTransform: "none",
+          fontWeight: 700,
+          fontSize: "0.95rem",
+          "&:hover": { backgroundColor: "#B69944" },
+          "&:disabled": { backgroundColor: "#E6E2D3", color: "#999" },
+          ...sx,
+        }}
+        {...props}
+      >
+        {children}
+      </Button>
+    );
+  }
+
+  function OutlineButton({ children, sx, ...props }) {
+    return (
+      <Button
+        variant="outlined"
+        sx={{
+          borderColor: "#C2A64C",
+          color: darkText,
+          fontWeight: 700,
+          borderRadius: "12px",
+          textTransform: "none",
+          px: 4,
+          py: 1.1,
+          "&:hover": {
+            backgroundColor: "#F6D76F",
+            borderColor: "#F6D76F",
+          },
           ...sx,
         }}
         {...props}

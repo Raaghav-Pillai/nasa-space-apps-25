@@ -12,15 +12,17 @@ export default function ConfirmStep({ location, profile, dates, onBack }) {
   const temp = t.tempRange || t.temperature || ["—", "—"];
   const wind = t.windMaxMph || t.wind || "—";
 
-// --- Format location ---
-const hasLocation = location?.city;
-const locationText = hasLocation
-  ? `${location.city}${location.region ? ", " + location.region : ""}${
-      location.coordinates
-        ? `\n${location.coordinates.lat.toFixed(4)}° N, ${location.coordinates.lng.toFixed(4)}° W`
-        : ""
-    }`
-  : "—";
+  // --- Format location for display ---
+  const hasLocation = location?.city || location?.coordinates;
+  const locationText = hasLocation
+    ? `${location.city || "—"}${
+        location.region ? ", " + location.region : ""
+      }${
+        location.coordinates
+          ? `\n${location.coordinates.lat.toFixed(4)}° N, ${location.coordinates.lng.toFixed(4)}° W`
+          : ""
+      }`
+    : "—";
 
   // --- Format date range ---
   const start = dates?.startDate
@@ -29,6 +31,50 @@ const locationText = hasLocation
   const end = dates?.endDate
     ? `${dates.endDate} ${dates.endTime || "23:59:59"}`
     : "—";
+
+  // --- Bundle all data for backend ---
+  const packagedData = {
+    location: {
+      city: location.city || null,
+      region: location.region || null,
+      coordinates: location.coordinates || null,
+    },
+    profile: {
+      name: t.name || profile?.profileName || "Custom Profile",
+      temperature: temp,
+      precip: t.precip || null,
+      windMaxMph: wind,
+      clouds: t.clouds || t.cloud || null,
+      minAQI: t.minAQI || t.aqi || null,
+      maxHumidity: t.maxHumidity || t.humidity || null,
+    },
+    dates: {
+      startDate: dates.startDate,
+      endDate: dates.endDate,
+      startTime: dates.startTime,
+      endTime: dates.endTime,
+    },
+  };
+
+  // --- Submit function ---
+  const handleSubmit = async () => {
+    try {
+      const response = await fetch("http://localhost:5000/api/report", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(packagedData),
+      });
+
+      if (!response.ok) throw new Error("Failed to send data");
+
+      const result = await response.json();
+      console.log("✅ Successfully sent data:", result);
+      alert("Report generated successfully!");
+    } catch (error) {
+      console.error("❌ Error sending data:", error);
+      alert("An error occurred while sending your data.");
+    }
+  };
 
   return (
     <Paper
@@ -82,12 +128,24 @@ const locationText = hasLocation
         <Typography fontWeight={700} color={darkText}>
           Profile: {t.name || profile?.profileName || "Custom Profile"}
         </Typography>
-        <Typography sx={{ color: darkText }}>Temp: {temp[0]}–{temp[1]}°F</Typography>
-        <Typography sx={{ color: darkText }}>Precipitation: {t.precip || "—"}</Typography>
-        <Typography sx={{ color: darkText }}>Max wind speed: {wind} mph</Typography>
-        <Typography sx={{ color: darkText }}>Cloud cover: {t.clouds || t.cloud || "—"}</Typography>
-        <Typography sx={{ color: darkText }}>Min AQI: {t.minAQI || t.aqi || "—"}</Typography>
-        <Typography sx={{ color: darkText }}>Max humidity: {t.maxHumidity || t.humidity || "—"}</Typography>
+        <Typography sx={{ color: darkText }}>
+          Temp: {temp[0]}–{temp[1]}°F
+        </Typography>
+        <Typography sx={{ color: darkText }}>
+          Precipitation: {t.precip || "—"}
+        </Typography>
+        <Typography sx={{ color: darkText }}>
+          Max wind speed: {wind} mph
+        </Typography>
+        <Typography sx={{ color: darkText }}>
+          Cloud cover: {t.clouds || t.cloud || "—"}
+        </Typography>
+        <Typography sx={{ color: darkText }}>
+          Min AQI: {t.minAQI || t.aqi || "—"}
+        </Typography>
+        <Typography sx={{ color: darkText }}>
+          Max humidity: {t.maxHumidity || t.humidity || "—"}
+        </Typography>
       </Box>
 
       {/* --- DATES --- */}
@@ -99,7 +157,7 @@ const locationText = hasLocation
           mb: 3,
         }}
       >
-        <Typography fontWeight={700} color={darkText}>
+        <Typography fontWeight={720} color={darkText}>
           Dates
         </Typography>
         <Typography color={darkText}>
@@ -146,7 +204,7 @@ const locationText = hasLocation
             py: 1.4,
             "&:hover": { backgroundColor: "#F3CD52" },
           }}
-          onClick={() => alert("Report generation coming soon!")}
+          onClick={handleSubmit}
         >
           SHOW ME MY REPORT!
         </Button>

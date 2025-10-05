@@ -143,82 +143,141 @@ export default function ProfileStep({ onBack, onNext }) {
             Select an Activity!
           </Typography>
 
-          <Grid container spacing={3} justifyContent="center">
-            {PRESETS.map((p, idx) => {
-              const isActive = selected?.id === p.id;
-              return (
-                <Grid item xs={12} sm={6} md={4} key={p.id}>
-                  <Paper
-                    elevation={isActive ? 6 : 2}
-                    onClick={() => handleSelectPreset(p)}
-                    sx={{
-                      cursor: "pointer",
-                      width: "100%",
-                      maxWidth: 260,
-                      mx: "auto",
-                      borderRadius: "16px",
-                      overflow: "hidden",
-                      border: isActive
-                        ? "2px solid #3B82F6"
-                        : "1px solid rgba(0,0,0,0.12)",
-                      transition: "all 0.25s ease",
-                      backgroundColor: "#FAF9F6",
-                      "&:hover": { boxShadow: "0 4px 10px rgba(0,0,0,0.15)" },
-                    }}
-                  >
-                    {/* Header strip */}
-                    <Box
-                      sx={{
-                        backgroundColor: "#F6D76F",
-                        py: 0.6,
-                        px: 1.5,
-                        display: "flex",
-                        alignItems: "center",
-                        borderBottom: "1px solid rgba(0,0,0,0.08)",
-                      }}
-                    >
-                      <NumberTag n={idx + 1} />
-                      <Typography variant="subtitle1" sx={{ fontWeight: 600, color: "#000" }}>
-                        {p.name}
-                      </Typography>
-                    </Box>
+{/* --- Card Grid --- */}
+<Box
+  sx={{
+    width: "100%",
+    maxWidth: 1200, // slightly wider container for visual balance
+    mx: "auto",
+    display: "flex",
+    justifyContent: "center",
+  }}
+>
+  <Grid
+    container
+    spacing={3}
+    justifyContent="center"
+    alignItems="stretch"
+    sx={{
+      width: "100%",
+      maxWidth: 1100,
+    }}
+  >
+    {PRESETS.map((p, idx) => {
+      const isActive = selected?.id === p.id;
+      return (
+        <Grid
+          item
+          key={p.id}
+          sx={{
+            flex: "0 0 31%", // ✅ consistent width for all cards (3 per row)
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "stretch",
+          }}
+        >
+          <Paper
+            elevation={isActive ? 6 : 2}
+            onClick={() => handleSelectPreset(p)}
+            sx={{
+              cursor: "pointer",
+              width: "100%",
+              height: 320, // ✅ fixed height for perfect vertical alignment
+              borderRadius: "12px",
+              overflow: "hidden",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between",
+              alignItems: "stretch",
+              backgroundColor: "#F3EFE6",
+              border: isActive
+                ? "2px solid #42360eff"
+                : "1px solid rgba(0,0,0,0.12)",
+              transition: "all 0.25s ease",
+            }}
+          >
+            {/* Header */}
+            <Box
+              sx={{
+                backgroundColor: "#F3EEDD",
+                py: 1.5,
+                px: 1.2,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                borderBottom: "1px solid rgba(0,0,0,0.08)",
+                minHeight: 56,
+              }}
+            >
+              <NumberTag n={idx + 1} />
+              <Typography
+                variant="title3"
+                sx={{
+                  fontWeight: 720,
+                  textAlign: "center",
+                  color: "#000",
+                  lineHeight: 1,
+                }}
+              >
+                {p.name}
+              </Typography>
+            </Box>
 
-                    {/* Placeholder visuals */}
-                    <Box
-                      sx={{
-                        height: 120,
-                        backgroundColor: "#E5E5E5",
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        gap: 1.5,
-                      }}
-                    >
-                      <Box sx={{ width: 24, height: 24, backgroundColor: "#C2C2C2", borderRadius: "6px" }} />
-                      <Box sx={{ width: 28, height: 28, backgroundColor: "#C2C2C2", borderRadius: "50%" }} />
-                      <Box
-                        sx={{
-                          width: 24,
-                          height: 24,
-                          backgroundColor: "#C2C2C2",
-                          clipPath: "polygon(50% 0%, 0% 100%, 100% 100%)",
-                        }}
-                      />
-                    </Box>
+            {/* Visuals */}
+            <Box
+              sx={{
+                flexGrow: 1,
+                backgroundColor: "#E9E6EF",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                gap: 1.5,
+              }}
+            >
+              <Box sx={{ width: 26, height: 26, backgroundColor: "#C7C2CC", borderRadius: "6px" }} />
+              <Box sx={{ width: 30, height: 30, backgroundColor: "#C7C2CC", borderRadius: "50%" }} />
+              <Box
+                sx={{
+                  width: 26,
+                  height: 26,
+                  backgroundColor: "#C7C2CC",
+                  clipPath: "polygon(50% 0%, 0% 100%, 100% 100%)",
+                }}
+              />
+            </Box>
 
-                    {/* Description */}
-                    <Box sx={{ px: 2, py: 1.5, minHeight: 60, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      <Typography variant="body2" sx={{ color: "#333", textAlign: "center" }}>
-                        {p.desc}
-                      </Typography>
-                    </Box>
-                  </Paper>
-                </Grid>
-              );
-            })}
-          </Grid>
+            {/* Footer */}
+            <Box
+              sx={{
+                backgroundColor: "#F3EFE6",
+                textAlign: "center",
+                py: 1.6,
+                px: 1.5,
+                minHeight: 60,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Typography
+                variant="body2"
+                sx={{
+                  color: "#333",
+                  fontWeight: 600,
+                  lineHeight: 1.4,
+                  fontSize: "0.9rem",
+                }}
+              >
+                {p.desc}
+              </Typography>
+            </Box>
+          </Paper>
+        </Grid>
+      );
+    })}
+  </Grid>
+</Box>
 
-          {/* Navigation buttons for preset page */}
 {/* Navigation buttons for preset page */}
 <Box sx={{ display: "flex", justifyContent: "space-between", mt: 3 }}>
   <Button

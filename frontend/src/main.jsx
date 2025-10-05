@@ -11,7 +11,7 @@ const theme = createTheme({
   cssVariables: true,
   colorSchemes: { light: true, dark: false },
   palette: {
-    primary: { main: '#3366FF' },
+    primary: { main: '#ddf4abff' },
     secondary: { main: '#6C757D' },
     background: { default: '#F8F9FA', paper: '#FFFFFF' },
   },
