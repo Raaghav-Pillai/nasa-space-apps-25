@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -12,16 +12,16 @@
         <!-- Progress Steps -->
         <div class="progress-container">
             <div class="step" id="step-location">
-                <span class="step-number">1</span> Location
+                <span class="step-icon">ðŸ“</span> Location
             </div>
             <div class="step" id="step-profile">
-                <span class="step-number">2</span> Profile
+                <span class="step-icon">ðŸ‘¤</span> Profile
             </div>
             <div class="step" id="step-dates">
-                <span class="step-number">3</span> Dates
+                <span class="step-icon">ðŸ“…</span> Dates
             </div>
             <div class="step" id="step-confirm">
-                <span class="step-number">4</span> Confirm
+                <span class="step-icon">âœ“</span> Confirm
             </div>
         </div>
 
@@ -32,7 +32,7 @@
                 <h2>Choose a location in the US!</h2>
                 <div class="search-container">
                     <input type="text" id="location-search" placeholder="e.g. Chicago" />
-                    <button id="search-btn">Search</button>
+                    <button id="search-btn">ðŸ”</button>
                 </div>
                 <div id="map"></div>
                 <div class="selected-location" id="selected-location-display">
@@ -50,52 +50,52 @@
                 <div class="activity-grid">
                     <div class="activity-card" onclick="selectActivity('beach')">
                         <div class="activity-number">1</div>
-                        <h3>Beach Day</h3>
+                        <h3>ðŸ–ï¸ Beach Day</h3>
                         <p>Prefers warm, sunny conditions</p>
                         <div class="activity-details">
-                            <span>Sunny</span>
-                            <span>75-90°F</span>
+                            <span>â˜€ï¸ Sunny</span>
+                            <span>ðŸŒ¡ï¸ 75-90Â°F</span>
                         </div>
                     </div>
                     <div class="activity-card" onclick="selectActivity('hiking')">
                         <div class="activity-number">2</div>
-                        <h3>Hiking</h3>
+                        <h3>ðŸ¥¾ Hiking</h3>
                         <p>Prefers mid-temperature, cloudy conditions</p>
                         <div class="activity-details">
-                            <span>Cloudy</span>
-                            <span>55-75°F</span>
+                            <span>â˜ï¸ Cloudy</span>
+                            <span>ðŸŒ¡ï¸ 55-75Â°F</span>
                         </div>
                     </div>
                     <div class="activity-card" onclick="selectActivity('skiing')">
                         <div class="activity-number">3</div>
-                        <h3>Skiing</h3>
+                        <h3>â›·ï¸ Skiing</h3>
                         <p>Prefers cold, mild conditions</p>
                         <div class="activity-details">
-                            <span>Cold</span>
-                            <span>20-40°F</span>
+                            <span>â„ï¸ Cold</span>
+                            <span>ðŸŒ¡ï¸ 20-40Â°F</span>
                         </div>
                     </div>
                     <div class="activity-card" onclick="selectActivity('rain')">
                         <div class="activity-number">4</div>
-                        <h3>Rain Dancing</h3>
+                        <h3>ðŸŒ§ï¸ Rain Dancing</h3>
                         <p>Prefers mid-temperature, rainy conditions</p>
                         <div class="activity-details">
-                            <span>Rainy</span>
-                            <span>60-75°F</span>
+                            <span>ðŸŒ§ï¸ Rainy</span>
+                            <span>ðŸŒ¡ï¸ 60-75Â°F</span>
                         </div>
                     </div>
                     <div class="activity-card" onclick="selectActivity('sailing')">
                         <div class="activity-number">5</div>
-                        <h3>Sailing</h3>
+                        <h3>â›µ Sailing</h3>
                         <p>Prefers warm, windy conditions</p>
                         <div class="activity-details">
-                            <span>Windy</span>
-                            <span>65-80°F</span>
+                            <span>ðŸ’¨ Windy</span>
+                            <span>ðŸŒ¡ï¸ 65-80Â°F</span>
                         </div>
                     </div>
                     <div class="activity-card" onclick="selectActivity('custom')">
                         <div class="activity-number">6</div>
-                        <h3>Custom</h3>
+                        <h3>âš™ï¸ Custom</h3>
                         <p>Create your own conditions!</p>
                     </div>
                 </div>
@@ -104,14 +104,14 @@
                 <div class="custom-profile hidden" id="custom-profile-form">
                     <h3>Create your profile...</h3>
                     <div class="form-group">
-                        <label>Ideal Temperature Range: <span id="temp-range-display">50-65°F</span></label>
+                        <label>ðŸŒ¡ï¸ Ideal Temperature Range: <span id="temp-range-display">50-65Â°F</span></label>
                         <div class="range-inputs">
                             <input type="range" id="temp-min" min="0" max="110" value="50" oninput="updateTempRange()">
                             <input type="range" id="temp-max" min="0" max="110" value="65" oninput="updateTempRange()">
                         </div>
                     </div>
                     <div class="form-group">
-                        <label>Precipitation:</label>
+                        <label>ðŸŒ§ï¸ Precipitation:</label>
                         <div class="radio-group">
                             <label><input type="radio" name="precip" value="none" checked> No chances of rain!</label>
                             <label><input type="radio" name="precip" value="drizzle"> A drizzle is okay</label>
@@ -119,11 +119,11 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label>Max Wind Speed: <span id="wind-display">30 mph</span></label>
+                        <label>ðŸ’¨ Max Wind Speed: <span id="wind-display">30 mph</span></label>
                         <input type="range" id="wind-speed" min="0" max="50" value="30" oninput="updateWindSpeed()">
                     </div>
                     <div class="form-group">
-                        <label>Cloud Cover:</label>
+                        <label>â˜ï¸ Cloud Cover:</label>
                         <div class="radio-group">
                             <label><input type="radio" name="clouds" value="clear" checked> Clear skies only</label>
                             <label><input type="radio" name="clouds" value="light"> Lightly Cloudy</label>
@@ -132,7 +132,7 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label>Max Humidity: <span id="humidity-display">87%</span></label>
+                        <label>ðŸ’§ Max Humidity: <span id="humidity-display">87%</span></label>
                         <input type="range" id="humidity" min="0" max="100" value="87" oninput="updateHumidity()">
                     </div>
                     <div class="form-group">
@@ -221,13 +221,13 @@
                 
                 <div class="confirmation-summary">
                     <div class="summary-card location-card">
-                        <h3>Location</h3>
+                        <h3>ðŸ“ Location</h3>
                         <p id="confirm-location">West Loop, Chicago, 60607</p>
-                        <p id="confirm-coords">41.8831° N, 87.6521° W</p>
+                        <p id="confirm-coords">41.8831Â° N, 87.6521Â° W</p>
                     </div>
                     
                     <div class="summary-card profile-card">
-                        <h3>Profile: <span id="confirm-profile-name">Profile Name</span></h3>
+                        <h3>ðŸ‘¤ Profile: <span id="confirm-profile-name">Profile Name</span></h3>
                         <p id="confirm-profile-details">
                             Temp: 50-65<br>
                             Precipitation: none<br>
@@ -239,7 +239,7 @@
                     </div>
                     
                     <div class="summary-card dates-card">
-                        <h3>Dates</h3>
+                        <h3>ðŸ“… Dates</h3>
                         <p id="confirm-dates">MM/DD/YYYY - MM/DD/YYYY</p>
                     </div>
                 </div>
@@ -267,14 +267,14 @@
     <!-- AI Chatbot -->
     <div id="chatbot-container" class="chatbot-container">
         <div class="chatbot-header">
-            <h3>AI Trip Planner</h3>
+            <h3>🤖 AI Trip Planner</h3>
             <button id="chatbot-toggle" class="chatbot-toggle-btn">−</button>
         </div>
         <div id="chatbot-body" class="chatbot-body">
             <div id="chat-messages" class="chat-messages">
                 <div class="chat-message bot-message">
                     <div class="message-content">
-                        Hi! I'm your AI trip planning assistant. I can help you:
+                        👋 Hi! I'm your AI trip planning assistant. I can help you:
                         <ul>
                             <li>Plan activities based on weather forecasts</li>
                             <li>Find local events at your destination</li>
@@ -293,7 +293,6 @@
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="azure-api-config.js"></script>
-    <script src="app.js"></script>
+    <script src="azure-api-config.js"></script>`n    <script src="app.js"></script>
 </body>
 </html>

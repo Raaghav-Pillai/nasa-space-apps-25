@@ -208,16 +208,34 @@ Current Context:
         # Add current context and message
         conversation_text += context
         
-        # Call Google Gemini
-        response = gemini_model.generate_content(
-            conversation_text,
-            generation_config=genai.types.GenerationConfig(
-                temperature=0.7,
-                max_output_tokens=800,
+        # Call Google Gemini with proper safety settings
+        try:
+            from google.generativeai.types import HarmCategory, HarmBlockThreshold
+            
+            response = gemini_model.generate_content(
+                conversation_text,
+                generation_config=genai.types.GenerationConfig(
+                    temperature=0.7,
+                    max_output_tokens=800,
+                ),
+                safety_settings={
+                    HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_NONE,
+                    HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_NONE,
+                    HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_NONE,
+                    HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_NONE,
+                }
             )
-        )
-        
-        ai_response = response.text
+            
+            # Check if response has valid text
+            if hasattr(response, 'text') and response.text:
+                ai_response = response.text
+            else:
+                # If blocked or no text, provide a helpful fallback
+                ai_response = "I can help you plan your trip! Based on the weather data, I can suggest activities and create an itinerary. What would you like to know?"
+        except Exception as e:
+            # Fallback response if Gemini fails
+            print(f"Gemini error: {e}")
+            ai_response = "I'm here to help with your trip planning! I can analyze weather forecasts, suggest activities, and recommend events. What would you like to know about your trip?"
         
         # Generate specific recommendations
         recommendations = []
