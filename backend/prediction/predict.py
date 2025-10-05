@@ -30,8 +30,11 @@ from datetime import datetime, timedelta
 import warnings
 warnings.filterwarnings('ignore')
 
-# Paths
-DATA_DIR = 'backend/data'
+# Paths - handle both running from root and from prediction folder
+if os.path.basename(os.getcwd()) == 'prediction':
+    DATA_DIR = '../data'
+else:
+    DATA_DIR = 'backend/data'
 MODELS_DIR = os.path.join(DATA_DIR, 'Modis')
 
 # Global caches
