@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+    container_name: nasa-elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    networks:
+      - nasa-network
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.11.0
+    container_name: nasa-kibana
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch
+    networks:
+      - nasa-network
+
+  backend:
+    build: ./backend
+    container_name: nasa-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - ELASTICSEARCH_HOST=elasticsearch:9200
+    depends_on:
+      - elasticsearch
+    volumes:
+      - ./backend:/app
+    networks:
+      - nasa-network
+
+volumes:
+  elasticsearch_data:
+
+networks:
+  nasa-network:
+    driver: bridge

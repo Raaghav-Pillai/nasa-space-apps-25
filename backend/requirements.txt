@@ -1,12 +1,12 @@
+azure-functions
+azure-storage-blob
+azure-search-documents
+elasticsearch
 requests
 xarray
 pandas
 matplotlib
 netCDF4
-azure-functions
-azure-storage-blob
-azure-search-documents
-elasticsearch
 joblib
 scikit-learn
 numpy
